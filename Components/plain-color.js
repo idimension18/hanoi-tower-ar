@@ -15,6 +15,14 @@ AFRAME.registerComponent('plain-color', {
           if (node.isMesh) node.material = material;
         });
       };
+
+      const objobject = this.el.object3D.objmodel;
+      if (objobject) {
+        object.traverse(function (node) {
+          if (node.isMesh) node.material = material;
+        });
+      };
+
     });
   },
 
