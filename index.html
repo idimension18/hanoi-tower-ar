@@ -1,53 +1,123 @@
-<!doctype html>
-<html>
-  <head>
-    <title>The chosen one</title>
-      <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-      <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.0/aframe/build/aframe-ar.js"></script>
-      <script src=" https://cdn.jsdelivr.net/gh/MozillaReality/ammo.js@8bbc0ea/builds/ammo.wasm.js "></script>
-      <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-physics-system@v4.2.3/dist/aframe-physics-system.js"></script>
-      <script src="aframe-mouse-dragndrop-1.1.0/src/index.js">
-      <script src="./Components/plain-color.js"></script>
-      <script src="./Components/physics-object.js"></script>
-  </head>
-  <body>
-    <a-scene physics="driver: ammo; debug:true" embedded arjs='sourceType: webcam;'>
-      <a-assets>
-        <a-asset-item id="base" src="./Assets/Models/base.obj"></a-asset-item>
-        <a-asset-item id="piece1" src="./Assets/Models/piece1.obj"></a-asset-item>
-        <a-asset-item id="piece2" src="./Assets/Models/piece2.obj"></a-asset-item>
-        <a-asset-item id="piece3" src="./Assets/Models/piece3.obj"></a-asset-item>
-        <a-asset-item id="piece4" src="./Assets/Models/piece4.obj"></a-asset-item>
-      </a-assets>
-      
-      <a-entity scale="0.01 0.01 0.01" position="-0.5 0 0"
-        obj-model="obj: #base" material="color: #909090" ammo-body="type: static" ammo-shape="type: hull">
-      </a-entity>
-
-
-      <a-entity scale="0.01 0.01 0.01" position="-0.5 2 0"
-        obj-model="obj: #piece1" material="color: blue" ammo-body="type: dynamic" ammo-shape="type: hull" dragndrop>
-      </a-entity>
-
-      <a-entity scale="0.01 0.01 0.01" position="-0.5 3 0"
-        obj-model="obj: #piece2" material="color: red" ammo-body="type: dynamic" ammo-shape="type: hull" dragndrop>
-      </a-entity>
-
-      <a-entity scale="0.01 0.01 0.01" position="-0.5 4 0"
-        obj-model="obj: #piece3" material="color: green" ammo-body="type: dynamic" ammo-shape="type: hull" dragndrop>
-      </a-entity>
-
-      <a-entity scale="0.01 0.01 0.01" position="-0.5 5 0"
-        obj-model="obj: #piece4" material="color: pink" ammo-body="type: dynamic" ammo-shape="type: hull" dragndrop>
-      </a-entity>
-
-
-      <a-box position="0 -1 0" width="100" depth="100" height="1" visible="false" ammo-body="type: static" ammo-shape="type: box"></a-box>
-    
-      <a-entity camera></a-entity>
-      <!-- Fix the marker at 0 0 0 -->
-      <a-marker-camera preset='hiro'></a-marker-camera>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Cube Suivant le Viseur en 2D</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <style>
+        .viseur {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 2px solid red;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <div class="viseur"></div>
+    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+        <a-marker preset="hiro">
+            <a-cylinder id="cube" position='0 0.5 0' radius='0.2' material='color: yellow;'></a-cylinder>
+            <a-cylinder id="cube2" position='1 0.5 0' radius='0.2' material='color: yellow;'></a-cylinder>
+            <a-cylinder id="cube3" position='-1 0.5 0' radius='0.2' material='color: yellow;'></a-cylinder>
+            <a-box id="plane" position="0 0 0" color="#ff0000" height='0.2' width='3'></a-box>
+        </a-marker>
+        <a-entity camera look-controls raycaster="objects: .clickable" cursor="fuse: false;"></a-entity>
     </a-scene>
-  </body>
-</html>
 
+    <script>
+        AFRAME.registerComponent('check-in-viseur', {
+            init: function () {
+                this.cube = document.querySelector('#cube');
+                this.cube2 = document.querySelector('#cube2');
+                this.cube3 = document.querySelector('#cube3');
+                this.plane = document.querySelector('#plane');
+
+                this.cube.classList.add('clickable');
+                this.cube2.classList.add('clickable');
+                this.cube3.classList.add('clickable');
+                this.plane.classList.add('clickable');
+                this.isCubeSelected = false;
+                this.marker = document.querySelector('a-marker');
+                this.camera = this.el.sceneEl.camera;
+
+                this.el.addEventListener('raycaster-intersection', (evt) => {
+                    this.handleIntersection(evt);
+                });
+
+                this.el.addEventListener('raycaster-intersection-cleared', () => {
+                    this.handleIntersectionCleared();
+                });
+
+                this.el.addEventListener('click', () => {
+                    this.handleClick();
+                });
+
+                this.el.addEventListener('raycaster-intersected', evt => {
+                  this.raycaster = evt.detail.el;
+                });
+                this.el.addEventListener('raycaster-intersected-cleared', evt => {
+                  this.raycaster = null;
+                });
+            },
+
+            tick: function () {
+              if (!this.raycaster) { 
+                //console.log("ha");
+                return; }  // Not intersecting.
+
+              let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+              if (!intersection) { return; }
+              console.log(intersection.point);
+            },
+
+            handleIntersection: function (evt) {
+                if (evt.detail.els.includes(this.cube)) {
+                    this.cube.setAttribute('material', 'color', 'green');
+                }
+                if (evt.detail.els.includes(this.cube2)) {
+                    this.cube2.setAttribute('material', 'color', 'green');
+                }
+                if (evt.detail.els.includes(this.cube3)) {
+                    this.cube3.setAttribute('material', 'color', 'green');
+                }
+                if(evt.detail.els.includes(this.plane))
+                {
+                  //console.log(evt.detail.intersections[0].point);
+                }
+            },
+
+            handleIntersectionCleared: function () {
+                if (!this.isCubeSelected) {
+                    this.cube.setAttribute('material', 'color', 'yellow');
+                }
+                if (!this.isCubeSelected) {
+                    this.cube2.setAttribute('material', 'color', 'yellow');
+                }
+                if (!this.isCubeSelected) {
+                    this.cube3.setAttribute('material', 'color', 'yellow');
+                }
+            },
+
+            handleClick: function () {
+                if (this.isCubeSelected) {
+                    this.isCubeSelected = false;
+                    this.cube.setAttribute('material', 'color', 'yellow');
+                } else if (this.cube.getAttribute('material').color === 'green') {
+                    this.isCubeSelected = true;
+                    this.cube.setAttribute('material', 'color', 'blue');
+                }
+            },
+        });
+
+        // Attacher le composant à la caméra
+        document.querySelector('a-entity[camera]').setAttribute('check-in-viseur', '');
+    </script>
+</body>
