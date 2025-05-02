@@ -25,6 +25,7 @@ AFRAME.registerComponent('tower', {
     },
 
     updateDisplay: function () {
+        console.log('display', this.pieceList);
         const objectPieces = document.querySelectorAll('[piece]');
         let i = 0;
         this.pieceList.forEach(piece => {
@@ -41,30 +42,35 @@ AFRAME.registerComponent('tower', {
         let i = 0;
         this.pieceList.forEach(piece => {
             if(piece == -1) {
-                if (i != 0) this.pieceList[i-1] = -1;
+                if (i != 0) {
+                    this.pieceList[i-1] = -1;
+                }
                 return prev;
             }
             prev = piece;
             i+=1;
         });
+        this.pieceList[3] = -1
         return prev;
     },
 
     TryPlacePiece: function (val){
-        console.log('trying to put: ', val);
+        let res = -1;
+        let i = 0;
         let prev = 4;//plus grand que la plus grande des pièces
         this.pieceList.forEach(piece => {
             if (piece == -1) {
-                console.log('found empty slot');
-                if (prev > piece) {
-                    console.log('piece placement allowed');
-                    piece = val;
-                    return val;
+                console.log('first place if', prev > piece, res != -1);
+                if (prev > piece && res == -1) {
+                    console.log('here tryplace');
+                    this.pieceList[i] = val;
+                    res = val;
                 }
-                return -1;
             }
+            i += 1;
             prev = piece;
         });
-        return -1;
+        console.log('place piece', this.pieceList);
+        return res;
     }
 });
