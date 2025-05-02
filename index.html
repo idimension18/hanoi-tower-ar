@@ -6,6 +6,7 @@
     <script src="https://raw.githack.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
     <script src="./Components/check-in-viseur.js"></script>
     <script src="./Components/piece.js"></script>
+    <script src="./Components/tower.js"></script>
     <style>
         .viseur {
             position: absolute;
@@ -24,9 +25,9 @@
     <div class="viseur"></div>
     <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
         <a-marker preset="hiro">
-            <a-cylinder id="cube" position='0 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>
-            <a-cylinder id="cube2" position='1 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>
-            <a-cylinder id="cube3" position='-1 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>7
+            <a-cylinder id="tower" tower="towerID : 1" position='0 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>
+            <a-cylinder id="tower2" tower="towerID : 2" position='1 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>
+            <a-cylinder id="tower3" tower="towerID : 0" position='-1 0.5 0' radius='0.1' material='color: yellow;'></a-cylinder>7
 
             <a-torus piece="pieceID : 0" ></a-torus>
             <a-torus piece="pieceID : 1" ></a-torus>
