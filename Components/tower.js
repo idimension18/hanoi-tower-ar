@@ -25,12 +25,13 @@ AFRAME.registerComponent('tower', {
     },
 
     updateDisplay: function () {
-        console.log('display', this.pieceList);
         const objectPieces = document.querySelectorAll('[piece]');
         let i = 0;
         this.pieceList.forEach(piece => {
             objectPieces.forEach(objectPiece =>{
-                if (objectPiece && objectPiece.id === piece) objectPiece.setPositionFromTower(this.towerID, i);
+                if (objectPiece.components['piece'].id === piece) {
+                    objectPiece.components['piece'].setPositionFromTower(this.towerID, i);
+                }
             });
             if(piece == -1) return;
             i += 1;
