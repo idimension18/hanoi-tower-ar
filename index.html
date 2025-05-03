@@ -7,6 +7,20 @@
     <script src="./Components/check-in-viseur.js"></script>
     <script src="./Components/piece.js"></script>
     <script src="./Components/tower.js"></script>
+    <style>
+        .viseur {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 2px solid red;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <div class="viseur"></div>
@@ -25,7 +39,6 @@
         </a-marker>
 
         <a-entity camera look-controls check-in-viseur raycaster="objects: .clickable" cursor="fuse: false;">
-            <a-cursor></a-cursor>
         </a-entity>
     </a-scene>
 </body>
