@@ -58,12 +58,10 @@ AFRAME.registerComponent('tower', {
     TryPlacePiece: function (val){
         let res = -1;
         let i = 0;
-        let prev = 4;//plus grand que la plus grande des pièces
+        let prev = -2;
         this.pieceList.forEach(piece => {
             if (piece == -1) {
-                console.log('first place if', prev > piece, res != -1);
-                if (prev > piece && res == -1) {
-                    console.log('here tryplace');
+                if (prev < piece && res == -1) {
                     this.pieceList[i] = val;
                     res = val;
                 }
@@ -71,7 +69,6 @@ AFRAME.registerComponent('tower', {
             i += 1;
             prev = piece;
         });
-        console.log('place piece', this.pieceList);
         return res;
     }
 });

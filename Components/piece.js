@@ -45,7 +45,7 @@ AFRAME.registerComponent('piece', {
     let towerPos = towerID - 1;
     let pieceHeight = pieceSlot/5.0 + 0.2;
     let posStr = towerPos.toString()+' '+pieceHeight.toString()+'  0';
-    console.log(posStr);
+    //console.log(posStr);
     this.el.setAttribute('position', posStr);
   }
 });
